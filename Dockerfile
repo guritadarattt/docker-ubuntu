@@ -1,17 +1,81 @@
 FROM --platform=linux/amd64 ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt update -y && apt install --no-install-recommends -y xfce4 xfce4-goodies tigervnc-standalone-server novnc websockify sudo xterm init systemd snapd vim net-tools curl wget git tzdata
-RUN apt update -y && apt install -y dbus-x11 x11-utils x11-xserver-utils x11-apps
-RUN apt install software-properties-common -y
-RUN add-apt-repository ppa:mozillateam/ppa -y
-RUN echo 'Package: *' >> /etc/apt/preferences.d/mozilla-firefox
-RUN echo 'Pin: release o=LP-PPA-mozillateam' >> /etc/apt/preferences.d/mozilla-firefox
-RUN echo 'Pin-Priority: 1001' >> /etc/apt/preferences.d/mozilla-firefox
-RUN echo 'Unattended-Upgrade::Allowed-Origins:: "LP-PPA-mozillateam:jammy";' | tee /etc/apt/apt.conf.d/51unattended-upgrades-firefox
-RUN apt update -y && apt install -y firefox
-RUN apt update -y && apt install -y xubuntu-icon-theme
-RUN touch /root/.Xauthority
-EXPOSE 5901
-EXPOSE 6080
-CMD bash -c "vncserver -localhost no -SecurityTypes None -geometry 1024x768 --I-KNOW-THIS-IS-INSECURE && openssl req -new -subj "/C=JP" -x509 -days 365 -nodes -out self.pem -keyout self.pem && websockify -D --web=/usr/share/novnc/ --cert=self.pem 6080 localhost:5901 && tail -f /dev/null"
+ENV TZ=Asia/Jakarta
+
+# Update dan install package dasar server (tanpa desktop environment)
+RUN apt update -y && apt install --no-install-recommends -y \
+    # Core system
+    init systemd systemd-sysv dbus \
+    # Networking tools
+    net-tools iproute2 iputils-ping dnsutils traceroute netcat-openbsd \
+    curl wget rsync telnet socat nmap tcpdump \
+    # SSH & remote
+    openssh-server openssh-client \
+    # Text editor & utilities
+    vim nano less man-db bash-completion \
+    # Process & system monitoring
+    htop top iotop sysstat lsof psmisc procps \
+    # File management
+    tar gzip bzip2 xz-utils zip unzip p7zip-full \
+    # Build essentials
+    build-essential gcc g++ make cmake pkg-config \
+    # Version control
+    git git-lfs \
+    # Python
+    python3 python3-pip python3-venv python3-dev \
+    # Package management
+    software-properties-common apt-utils apt-transport-https ca-certificates gnupg lsb-release \
+    # Security
+    sudo ufw fail2ban \
+    # Time & locale
+    tzdata locales \
+    # Misc essentials
+    cron logrotate rsyslog \
+    # SSL/TLS
+    openssl ca-certificates \
+    # Database clients
+    mysql-client postgresql-client redis-tools \
+    # Web tools
+    nginx-light \
+    # Archive & compression
+    zstd lz4 \
+    # Disk utilities
+    parted gdisk fdisk e2fsprogs dosfstools \
+    # Additional tools
+    jq yq tree file which bc \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Setup locale
+RUN locale-gen en_US.UTF-8 && \
+    update-locale LANG=en_US.UTF-8
+
+# Setup SSH
+RUN mkdir -p /var/run/sshd && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+
+# Set root password (ganti sesuai kebutuhan)
+RUN echo 'root:root' | chpasswd
+
+# Setup timezone
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Cleanup untuk mengurangi ukuran image
+RUN apt autoremove -y && \
+    apt autoclean -y && \
+    rm -rf /var/lib/apt/lists/* \
+           /var/cache/apt/archives/* \
+           /tmp/* \
+           /var/tmp/* \
+           /usr/share/doc/* \
+           /usr/share/man/* \
+           /usr/share/locale/* \
+           /var/log/*.log
+
+# Expose port SSH
+EXPOSE 22
+
+# Start SSH service
+CMD ["/usr/sbin/sshd", "-D"]

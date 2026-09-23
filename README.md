@@ -37,12 +37,11 @@ text
 https://hub.docker.com/r/akarita/docker-ubuntu-server
 
 ## Docker Pull
-$ docker pull akarita/docker-ubuntu-server
-
+$ docker pull guritadarattt/docker-ubuntu/
 text
 
 ## Docker Build
-$ docker build . -t docker-ubuntu-server
+$ docker build . -t docker-ubuntu
 
 text
 
@@ -50,7 +49,7 @@ text
 $ docker run -d --name ubuntu-server
 -p 2222:22
 -v ubuntu-server-data:/data
-akarita/docker-ubuntu-server
+guritadarattt/docker-ubuntu
 
 text
 

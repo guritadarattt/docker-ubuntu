@@ -1,77 +1,44 @@
-# docker-ubuntu-server
-Minimal Ubuntu Server Docker Image (Headless, No Desktop Environment)
+# 🐙 GURITA VPS
 
-## Description
-Docker image berbasis **Ubuntu 22.04 Server** tanpa desktop environment (headless).
-Dirancang ringan dan siap pakai untuk kebutuhan server seperti SSH remote access,
-networking tools, build essentials, Python, database clients, dan lain-lain.
+Lightweight Ubuntu 22.04 server container dengan SSH, banner custom, dan multi-service (cron, rsyslog, fail2ban) yang dikelola oleh **supervisord** — tanpa perlu `--privileged` dan tanpa systemd.
 
-## Features
-- 🐧 Base: Ubuntu 22.04 (amd64)
-- 🪶 Ringan, tanpa GUI/desktop environment
-- 🔐 SSH server siap pakai (port 22)
-- 🌐 Networking tools lengkap (ping, dig, traceroute, nmap, tcpdump, dll)
-- 🛠️ Build essentials (gcc, g++, make, cmake, pkg-config)
-- 🐍 Python 3 + pip + venv
-- 🗄️ Database clients (MySQL, PostgreSQL, Redis)
-- 📦 Utilities: git, curl, wget, rsync, vim, htop, jq, tree, dll
-- 🛡️ Security: ufw, fail2ban, openssl
+![Ubuntu](https://img.shields.io/badge/Ubuntu-22.04-E95420?logo=ubuntu&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white)
+![Size](https://img.shields.io/badge/Size-~220MB-blue)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-## Usage
-$ docker run -d --name ubuntu-server -p 2222:22 akarita/docker-ubuntu-server
+---
 
-text
+## ✨ Fitur
 
-## Access via SSH
-$ ssh root@localhost -p 2222
+- ✅ **Base Ubuntu 22.04** — kompatibel dengan mayoritas tool Linux
+- ✅ **Supervisord** sebagai init — ringan (~5MB), multi-service, tanpa `--privileged`
+- ✅ **SSH Server** — siap remote login sejak container pertama kali jalan
+- ✅ **Banner custom GURITA VPS** — ASCII art + info user/host/uptime/IP
+- ✅ **Multi-service otomatis**:
+  - `sshd` — SSH server
+  - `cron` — scheduler
+  - `rsyslog` — system log
+  - `fail2ban` — proteksi brute-force
+- ✅ **Default password**: `Gurita26` (bisa di-override saat build)
+- ✅ **Ringan** (~220–280 MB) — jauh lebih kecil dari versi systemd
+- ✅ **Best practice Docker** — jalan di Docker Swarm/K8s tanpa modifikasi
 
-text
-Default password: `root` (⚠️ **segera ganti setelah login pertama!**)
+---
 
-Ganti password di dalam container:
-$ passwd
+## 📦 Persyaratan
 
-text
+- Docker Engine `20.10+`
+- Docker Compose `1.29+` (opsional)
+- RAM minimal `256 MB` per container
+- Disk kosong minimal `500 MB`
 
-## DockerHub
-https://hub.docker.com/r/akarita/docker-ubuntu-server
+---
 
-## Docker Pull
-$ docker pull guritadarattt/docker-ubuntu/
-text
+## 🚀 Instalasi Cepat
 
-## Docker Build
-$ docker build . -t docker-ubuntu
+### 1. Clone repository
 
-text
-
-## Run dengan Volume Persisten (opsional)
-$ docker run -d --name ubuntu-server
--p 2222:22
--v ubuntu-server-data:/data
-guritadarattt/docker-ubuntu
-
-text
-
-## Customization
-Jika ingin mengubah timezone, edit pada Dockerfile:
-```dockerfile
-ENV TZ=Asia/Jakarta
-Jika ingin mengubah default password root, edit:
-
-dockerfile
-RUN echo 'root:root' | chpasswd
-Included Packages (ringkasan)
-Kategori	Package
-Core	init, systemd, dbus
-Networking	net-tools, iproute2, iputils-ping, dnsutils, traceroute, nmap, tcpdump, netcat, socat
-SSH	openssh-server, openssh-client
-Editor	vim, nano
-Monitoring	htop, iotop, sysstat, lsof, psmisc
-Build	build-essential, gcc, g++, make, cmake
-Python	python3, pip, venv, dev
-Database Clients	mysql-client, postgresql-client, redis-tools
-Utilities	git, curl, wget, rsync, jq, tree, zip, unzip, 7zip
-Security	ufw, fail2ban, openssl
-License
-MIT License (c) 2023 Takahashi Akari
+```bash
+git clone https://github.com/username/gurita-vps.git
+cd gurita-vps

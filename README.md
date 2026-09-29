@@ -8,6 +8,13 @@ Lightweight Ubuntu 22.04 server container dengan SSH, banner custom, dan multi-s
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
+## 📝 Lisensi
+
+MIT License
+
+Copyright (c) 2023 Gurita Darat
+
+Lihat file [LICENSE](LICENSE) untuk detail lengkap.
 
 ## ✨ Fitur
 

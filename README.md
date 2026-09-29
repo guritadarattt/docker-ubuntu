@@ -58,9 +58,12 @@ docker run -d \
   --restart unless-stopped \
   -p 2222:22 \
   gurita-vps:latest
+```
 4. Login SSH
+```
 bash
 ssh root@localhost -p 2222
+```
 Password default:
 ```
 text

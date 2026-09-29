@@ -256,13 +256,15 @@ docker exec -it gurita-vps bash -c "
   mkdir -p /root/.ssh && \
   echo 'ssh-rsa AAAA...' > /root/.ssh/authorized_keys && \
   chmod 700 /root/.ssh && chmod 600 /root/.ssh/authorized_keys
-"```
+"
+```
 Lalu di /etc/ssh/sshd_config set PasswordAuthentication no.
 
 Ganti port SSH dari 22 ke port lain:
 
-bash
+```bash
 docker run -d -p 22222:22 gurita-vps:latest
+```
 Batasi IP yang bisa SSH menggunakan firewall host.
 
 Aktifkan fail2ban (sudah otomatis jalan via supervisord).

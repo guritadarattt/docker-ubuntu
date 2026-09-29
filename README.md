@@ -44,10 +44,14 @@ Lightweight Ubuntu 22.04 server container dengan SSH, banner custom, dan multi-s
 ```bash
 git clone https://github.com/username/gurita-vps.git
 cd gurita-vps
+```
 2. Build image
+```
 bash
 docker build -t gurita-vps:latest .
+```
 3. Jalankan container
+```
 bash
 docker run -d \
   --name gurita-vps \

@@ -46,13 +46,11 @@ git clone https://github.com/username/gurita-vps.git
 cd gurita-vps
 ```
 2. Build image
-```
-bash
+```bash
 docker build -t gurita-vps:latest .
 ```
 3. Jalankan container
-```
-bash
+```bash
 docker run -d \
   --name gurita-vps \
   --restart unless-stopped \
@@ -60,18 +58,15 @@ docker run -d \
   gurita-vps:latest
 ```
 4. Login SSH
-```
-bash
+```bash
 ssh root@localhost -p 2222
 ```
 Password default:
-```
-text
+```text
 Gurita26
 ```
 🎨 Tampilan Setelah Login
-```
-text
+```text
 ==========================================
           G U R I T A   V P S
 ==========================================
@@ -92,28 +87,23 @@ text
 ```
 🔐 Konfigurasi Password
 Ganti password saat build (opsional)
-```
-bash
+```bash
 docker build --build-arg ROOT_PASSWORD=PasswordBaru123 -t gurita-vps:latest .
 ```
 Ganti password setelah container jalan
-```
-bash
+```bash
 docker exec -it gurita-vps passwd root
 ```
 ⚠️ Peringatan: Ganti password default Gurita26 sebelum deploy ke production!
 
 ⚙️ Manajemen Service
 Semua service dikelola oleh supervisord. Cek status:
-```
-
-bash
+```bash
 docker exec -it gurita-vps supervisorctl status
 ```
 Output yang diharapkan:
 
-```
-text
+```text
 cron      RUNNING   pid 12, uptime 0:05:15
 fail2ban  RUNNING   pid 14, uptime 0:05:12
 rsyslog   RUNNING   pid 13, uptime 0:05:14
@@ -121,18 +111,16 @@ sshd      RUNNING   pid 11, uptime 0:05:15
 ```
 Perintah supervisord yang berguna
 Perintah	Fungsi
-```
 supervisorctl status	Cek status semua service
 supervisorctl restart sshd	Restart service SSH
 supervisorctl stop cron	Hentikan service cron
 supervisorctl start cron	Jalankan service cron
 supervisorctl restart all	Restart semua service
 supervisorctl tail -f sshd	Lihat log SSH real-time
-```
+
 Contoh pemakaian:
 
-```
-bash
+```bash
 docker exec -it gurita-vps supervisorctl restart sshd
 ```
 🌐 Port yang Tersedia
@@ -141,8 +129,7 @@ Port	Service	Keterangan
 80	HTTP	Siap untuk web server (nginx/apache)
 443	HTTPS	Siap untuk web server SSL
 Mapping port saat docker run:
-```
-bash
+```bash
 docker run -d \
   --name gurita-vps \
   -p 2222:22 \
@@ -160,29 +147,24 @@ Path	Isi
 /etc/fail2ban/	Konfigurasi fail2ban
 🧪 Testing
 Test SSH
-```
-bash
+```bash
 ssh root@localhost -p 2222
 ```
 # Masukkan password: Gurita26
 Test cron
-```
-bash
+```bash
 docker exec -it gurita-vps bash -c "echo '* * * * * echo hello >> /tmp/cron-test.log' | crontab -"
 ```
 # Tunggu 1-2 menit
-```
 docker exec -it gurita-vps cat /tmp/cron-test.log
 Test fail2ban
-```
-bash
+```bash
 docker exec -it gurita-vps fail2ban-client status
 docker exec -it gurita-vps fail2ban-client status sshd
 ```
 🐳 Docker Compose (Opsional)
 Buat file docker-compose.yml:
-```
-yaml
+```yaml
 version: "3.8"
 
 services:
@@ -207,8 +189,7 @@ volumes:
   gurita-data:
 ```
 Jalankan:
-```
-bash
+```bash
 docker compose up -d
 docker compose logs -f
 ```
@@ -217,15 +198,13 @@ Versi	Base	Init	Estimasi Ukuran
 GURITA VPS (supervisord)	ubuntu:22.04	supervisord	~220–280 MB
 Versi systemd	ubuntu:22.04	systemd	~350–450 MB
 Cek ukuran image Anda:
-```
-bash
+```bash
 docker images gurita-vps:latest
 ```
 🔧 Troubleshooting
 ❌ Container langsung mati
 Cek log:
-```
-bash
+```bash
 docker logs gurita-vps
 ```
 Biasanya karena:
@@ -236,51 +215,43 @@ Supervisord config error → cek /var/log/supervisor/supervisord.log
 
 ❌ Tidak bisa SSH
 Pastikan container jalan:
-```
-bash
+```bash
 docker ps
 ```
 Cek service sshd:
-```
-bash
+```bash
 docker exec -it gurita-vps supervisorctl status sshd
 ```
 Cek port:
-```
-bash
+```bash
 docker port gurita-vps
 ```
 ❌ Banner tidak muncul
 Pastikan login sebagai shell interaktif:
 
-```
-bash
+```bash
 ssh -t root@localhost -p 2222
 ```
 -t memaksa alokasi TTY, agar /etc/profile.d/gurita-banner.sh dijalankan.
 
 ❌ supervisorctl error "connection refused"
 Cek socket supervisord:
-```
-bash
+```bash
 docker exec -it gurita-vps ls -la /var/run/supervisor.sock
 ```
 Jika tidak ada, berarti supervisord belum jalan sempurna. Cek log:
-```
-bash
+```bash
 docker exec -it gurita-vps cat /var/log/supervisor/supervisord.log
 ```
 🔒 Keamanan untuk Production
 Sebelum deploy ke production, lakukan hal berikut:
 
 Ganti password default Gurita26:
-```
-bash
+```bash
 docker exec -it gurita-vps passwd root
 ```
 Gunakan SSH key daripada password:
-```
-bash
+```bash
 docker exec -it gurita-vps bash -c "
   mkdir -p /root/.ssh && \
   echo 'ssh-rsa AAAA...' > /root/.ssh/authorized_keys && \
@@ -311,12 +282,8 @@ Pull request selalu diterima! Untuk perubahan besar, buka issue terlebih dahulu 
 📞 Kontak
 Author: Gurita Darat
 
-Repo: https://github.com/username/gurita-vps
+Repo: https://github.com/guritadarattt/docker-ubuntu/
 
-Issues: https://github.com/username/gurita-vps/issues
+Issues: https://github.com/guritadarattt/docker-ubuntu/issues
 
 ⭐ Jangan lupa bintangnya kalau repo ini bermanfaat!
-
-text
-
----

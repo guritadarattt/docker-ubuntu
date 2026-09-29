@@ -58,10 +58,12 @@ docker run -d \
 bash
 ssh root@localhost -p 2222
 Password default:
-
+```
 text
 Gurita26
+```
 🎨 Tampilan Setelah Login
+```
 text
 ==========================================
           G U R I T A   V P S
@@ -80,46 +82,59 @@ text
  Date     : Mon Sep 29 10:30:00 WIB 2026
  IP       : 172.17.0.2
 ==========================================
+```
 🔐 Konfigurasi Password
 Ganti password saat build (opsional)
+```
 bash
 docker build --build-arg ROOT_PASSWORD=PasswordBaru123 -t gurita-vps:latest .
+```
 Ganti password setelah container jalan
+```
 bash
 docker exec -it gurita-vps passwd root
+```
 ⚠️ Peringatan: Ganti password default Gurita26 sebelum deploy ke production!
 
 ⚙️ Manajemen Service
 Semua service dikelola oleh supervisord. Cek status:
+```
 
 bash
 docker exec -it gurita-vps supervisorctl status
+```
 Output yang diharapkan:
 
+```
 text
 cron      RUNNING   pid 12, uptime 0:05:15
 fail2ban  RUNNING   pid 14, uptime 0:05:12
 rsyslog   RUNNING   pid 13, uptime 0:05:14
 sshd      RUNNING   pid 11, uptime 0:05:15
+```
 Perintah supervisord yang berguna
 Perintah	Fungsi
+```
 supervisorctl status	Cek status semua service
 supervisorctl restart sshd	Restart service SSH
 supervisorctl stop cron	Hentikan service cron
 supervisorctl start cron	Jalankan service cron
 supervisorctl restart all	Restart semua service
 supervisorctl tail -f sshd	Lihat log SSH real-time
+```
 Contoh pemakaian:
 
+```
 bash
 docker exec -it gurita-vps supervisorctl restart sshd
+```
 🌐 Port yang Tersedia
 Port	Service	Keterangan
 22	SSH	Untuk remote login
 80	HTTP	Siap untuk web server (nginx/apache)
 443	HTTPS	Siap untuk web server SSL
 Mapping port saat docker run:
-
+```
 bash
 docker run -d \
   --name gurita-vps \
@@ -127,6 +142,7 @@ docker run -d \
   -p 8080:80 \
   -p 8443:443 \
   gurita-vps:latest
+```
 📂 Struktur Direktori Penting
 Path	Isi
 /etc/ssh/sshd_config	Konfigurasi SSH server
@@ -137,21 +153,28 @@ Path	Isi
 /etc/fail2ban/	Konfigurasi fail2ban
 🧪 Testing
 Test SSH
+```
 bash
 ssh root@localhost -p 2222
+```
 # Masukkan password: Gurita26
 Test cron
+```
 bash
 docker exec -it gurita-vps bash -c "echo '* * * * * echo hello >> /tmp/cron-test.log' | crontab -"
+```
 # Tunggu 1-2 menit
+```
 docker exec -it gurita-vps cat /tmp/cron-test.log
 Test fail2ban
+```
 bash
 docker exec -it gurita-vps fail2ban-client status
 docker exec -it gurita-vps fail2ban-client status sshd
+```
 🐳 Docker Compose (Opsional)
 Buat file docker-compose.yml:
-
+```
 yaml
 version: "3.8"
 
@@ -175,25 +198,29 @@ services:
 
 volumes:
   gurita-data:
+```
 Jalankan:
-
+```
 bash
 docker compose up -d
 docker compose logs -f
+```
 📊 Ukuran Image
 Versi	Base	Init	Estimasi Ukuran
 GURITA VPS (supervisord)	ubuntu:22.04	supervisord	~220–280 MB
 Versi systemd	ubuntu:22.04	systemd	~350–450 MB
 Cek ukuran image Anda:
-
+```
 bash
 docker images gurita-vps:latest
+```
 🔧 Troubleshooting
 ❌ Container langsung mati
 Cek log:
-
+```
 bash
 docker logs gurita-vps
+```
 Biasanya karena:
 
 Port 22 sudah dipakai container lain → ganti mapping (-p 2223:22)
@@ -202,48 +229,56 @@ Supervisord config error → cek /var/log/supervisor/supervisord.log
 
 ❌ Tidak bisa SSH
 Pastikan container jalan:
-
+```
 bash
 docker ps
+```
 Cek service sshd:
-
+```
 bash
 docker exec -it gurita-vps supervisorctl status sshd
+```
 Cek port:
-
+```
 bash
 docker port gurita-vps
+```
 ❌ Banner tidak muncul
 Pastikan login sebagai shell interaktif:
 
+```
 bash
 ssh -t root@localhost -p 2222
+```
 -t memaksa alokasi TTY, agar /etc/profile.d/gurita-banner.sh dijalankan.
 
 ❌ supervisorctl error "connection refused"
 Cek socket supervisord:
-
+```
 bash
 docker exec -it gurita-vps ls -la /var/run/supervisor.sock
+```
 Jika tidak ada, berarti supervisord belum jalan sempurna. Cek log:
-
+```
 bash
 docker exec -it gurita-vps cat /var/log/supervisor/supervisord.log
+```
 🔒 Keamanan untuk Production
 Sebelum deploy ke production, lakukan hal berikut:
 
 Ganti password default Gurita26:
-
+```
 bash
 docker exec -it gurita-vps passwd root
+```
 Gunakan SSH key daripada password:
-
+```
 bash
 docker exec -it gurita-vps bash -c "
   mkdir -p /root/.ssh && \
   echo 'ssh-rsa AAAA...' > /root/.ssh/authorized_keys && \
   chmod 700 /root/.ssh && chmod 600 /root/.ssh/authorized_keys
-"
+"```
 Lalu di /etc/ssh/sshd_config set PasswordAuthentication no.
 
 Ganti port SSH dari 22 ke port lain:
